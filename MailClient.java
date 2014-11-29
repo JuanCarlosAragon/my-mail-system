@@ -96,6 +96,9 @@ public class MailClient
     public void printLastMailItem(){
         print();
     }
+    /**
+     * Imprime por pantalla las estadísticas del cliente
+     */
     public void viewStadistic(){
         float spanStadistic;
         if(countOfRecibed != 0){
@@ -110,6 +113,9 @@ public class MailClient
                            "\n" + "Porcentaje de Span: " + spanStadistic + "%"
                            + "\nAutor con email mas largo: " + longestAuthor);
     }
+    /**
+     * Imprime por pantalla el último email de SPAN si es que alguna vez se recibio uno
+     */
     public void printLastSpanEmail(){
         if(spanEmail != null){
             spanEmail.print();
@@ -117,6 +123,16 @@ public class MailClient
         else{
             System.out.println("No ha recibido mensajes de SPAN, aún...");
         }
+    }
+    /**
+     * Manda un mensaje en el que se establecen unas interferencias para imitar un fallo
+     * digital
+     */
+    public void sendMailItemWithTransmissionError(String to, String subject, String message){
+        message = message.replace("a","#&");
+        message = message.replace("e","$#");
+        sendMailItem(to,subject,message);
+        
     }
     
     //------------------------------METODOS PRIVADOS--------------------------------
