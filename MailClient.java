@@ -21,6 +21,7 @@ public class MailClient
     private int countOfSpan;
     private String longestAuthor;
     private int numberOfCharacters;
+
     
     public MailClient(MailServer server, String user){
         this.server = server;
@@ -36,6 +37,7 @@ public class MailClient
         countOfSpan = 0;
         longestAuthor = "";
         numberOfCharacters = 0;
+ 
     }
     /**
      * Metodo que obtiene el ultimo mensaje que halla para el usuario del cliente y
@@ -61,9 +63,11 @@ public class MailClient
      */
     public void sendMailItem(String to, String subject, String message){
         MailItem email = new MailItem(user, to, subject, message);
+        
         server.post(email);
         //Aumentamos la cuenta de enviados
         countOfSend = countOfSend + 1;
+       
     }
     /**
      * método que responderá automaticamente los mensajes contestando que estamos
@@ -131,10 +135,11 @@ public class MailClient
     public void sendMailItemWithTransmissionError(String to, String subject, String message){
         message = message.replace("a","#&");
         message = message.replace("e","$#");
+    
         sendMailItem(to,subject,message);
         
+        
     }
-    
     //------------------------------METODOS PRIVADOS--------------------------------
     /**
      * PRIVADO:

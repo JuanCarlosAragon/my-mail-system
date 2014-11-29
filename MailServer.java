@@ -64,6 +64,6 @@ public class MailServer
      */
     public void post(MailItem item)
     {
-        items.add(item);
+            items.add(item);
     }
 }
