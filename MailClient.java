@@ -12,6 +12,7 @@ public class MailClient
     private String user;
     //Atributos para el guardado del último email
     private MailItem savedEmail;
+    private MailItem spanEmail;
     //Atributo para el clasificado de SPAN
     private boolean isSpan;
     //CONTADORES PARA ESTADISTICAS:
@@ -109,6 +110,14 @@ public class MailClient
                            "\n" + "Porcentaje de Span: " + spanStadistic + "%"
                            + "\nAutor con email mas largo: " + longestAuthor);
     }
+    public void printLastSpanEmail(){
+        if(spanEmail != null){
+            spanEmail.print();
+        }
+        else{
+            System.out.println("No ha recibido mensajes de SPAN, aún...");
+        }
+    }
     
     //------------------------------METODOS PRIVADOS--------------------------------
     /**
@@ -155,6 +164,7 @@ public class MailClient
                    (message.indexOf("viagra") != -1)){
                isSpan = true;
                countOfSpan = countOfSpan + 1;
+               spanEmail = savedEmail;
            }
         }
     }
