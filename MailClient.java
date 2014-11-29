@@ -10,6 +10,7 @@ public class MailClient
     private MailServer server;
     private String user;
     private MailItem savedEmail;
+    private boolean isSpan;
     
     public MailClient(MailServer server, String user){
         this.server = server;
@@ -17,6 +18,8 @@ public class MailClient
         //Actualizamos por si hubiese algun mensaje en el servidor pendiente y
         //de paso inicializamos la variable savedEmail
         actualice();
+        //Inicializamos la variable isSpan comprobando si el mensaje guardado lo es.
+        isSpan();
     }
     /**
      * Metodo que obtiene el ultimo mensaje que halla para el usuario del cliente y
@@ -74,16 +77,22 @@ public class MailClient
     public void printLastMailItem(){
         print();
     }
+    
+    
+    //------------------------------METODOS PRIVADOS--------------------------------
     /**
      * PRIVADO:
      * Imprime por pantalla el email guardad en memoria
      */
     private void print(){
-        if(savedEmail != null){
+        if(savedEmail != null & (isSpan == false)){
             savedEmail.print();
         }
+        else if(savedEmail != null & (isSpan == true)){
+           printAsSpan();
+        }
         else{
-            System.out.println("No hay mensajes pendientes");
+             System.out.println("No hay mensajes pendientes");
         }
     }
     /**
@@ -92,5 +101,29 @@ public class MailClient
      */
     private void actualice(){
         savedEmail = server.getNextMailItem(user);
+        isSpan();
+    }
+    /**
+     * PRIVADO:
+     * comprueba si un email es SPAN y lo marca como tál
+     */
+    private void isSpan(){
+        isSpan = false;
+        if(savedEmail != null){       
+           String message = savedEmail.getMessage();
+           if(message.indexOf("proyecto") != -1){
+                isSpan = false;
+           }
+           else if((message.indexOf("oferta") != -1) | (message.indexOf("viagra") != -1)){
+               isSpan = true;
+           }
+        }
+    }
+    /** 
+     * PRIVADO:
+     * Imprime el mensaje como SPAN
+     */
+    private void printAsSpan(){
+        System.out.println("From: " + savedEmail.getFrom() + "\n Subject: SPAN \n Message: SPAN"); 
     }
 }
