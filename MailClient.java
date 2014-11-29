@@ -45,4 +45,23 @@ public class MailClient
         MailItem email = new MailItem(user, to, subject, message);
         server.post(email);
     }
+    /**
+     * método que responderá automaticamente los mensajes contestando que estamos
+     * de vacaciones
+     */
+    public void getNextMailItemAndAutorespond(){
+        //Creamos una variable local donde guardar nuestro email y guardamos
+        //En ella el último email del servidor
+        MailItem email = getNextMailItem();
+        //Comprobamos que hubiese algún email y en caso afirmativo lo procesamos
+        if(email != null){
+            //Para ello nos creamos dos variables locales donde poder guardar
+            //La información y cambiarla
+            String subject = "RE: " + email.getSubject();
+            String message = "Estoy de vacaciones \n" + email.getMessage();
+            
+            //Enviamos el email al que nos lo envio
+            sendMailItem(email.getFrom(), subject, message);
+        }
+    }
 }
