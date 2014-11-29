@@ -21,6 +21,10 @@ public class MailClient
     private int countOfSpan;
     private String longestAuthor;
     private int numberOfCharacters;
+    //control de errores de mensaje
+    private int originalMessage;
+    private int afterMessage;
+    private boolean errorControl;
 
     
     public MailClient(MailServer server, String user){
@@ -37,6 +41,10 @@ public class MailClient
         countOfSpan = 0;
         longestAuthor = "";
         numberOfCharacters = 0;
+        //Inicializamos los controles de errores
+        originalMessage = 0;
+        afterMessage = 0;
+        errorControl = false;
  
     }
     /**
@@ -63,10 +71,16 @@ public class MailClient
      */
     public void sendMailItem(String to, String subject, String message){
         MailItem email = new MailItem(user, to, subject, message);
-        
-        server.post(email);
+        if(originalMessage != afterMessage){
+            errorControl = true;
+        }
+        server.post(email,errorControl);
         //Aumentamos la cuenta de enviados
         countOfSend = countOfSend + 1;
+        //reseteamos los controles de errores
+        originalMessage = 0;
+        afterMessage = 0;
+        errorControl = false;
        
     }
     /**
@@ -133,8 +147,10 @@ public class MailClient
      * digital
      */
     public void sendMailItemWithTransmissionError(String to, String subject, String message){
+        originalMessage = message.length();
         message = message.replace("a","#&");
         message = message.replace("e","$#");
+        afterMessage = message.length();
     
         sendMailItem(to,subject,message);
         
