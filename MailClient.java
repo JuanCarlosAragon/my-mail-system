@@ -9,10 +9,14 @@ public class MailClient
 {
     private MailServer server;
     private String user;
+    private MailItem savedEmail;
     
     public MailClient(MailServer server, String user){
         this.server = server;
         this.user = user;
+        //Actualizamos por si hubiese algun mensaje en el servidor pendiente y
+        //de paso inicializamos la variable savedEmail
+        actualice();
     }
     /**
      * Metodo que obtiene el ultimo mensaje que halla para el usuario del cliente y
@@ -20,8 +24,8 @@ public class MailClient
      * El email se borra del servidor y el método no lo guarda
      */
     public MailItem getNextMailItem(){
-        MailItem email = server.getNextMailItem(user);
-        return email;
+        actualice();
+        return savedEmail;
     }
     /**
      * Imprime el último mensaje del servidor mediante el metodo local 
@@ -30,13 +34,8 @@ public class MailClient
      * Si no hay mensajes en el servidor, avisa de ello.
      */
     public void printNextMailItem(){
-        MailItem email = getNextMailItem();
-        if(email != null){
-            email.print();
-        }
-        else{
-            System.out.println("No hay mensajes pendientes");
-        }
+        actualice();
+        print();
     }
     /**
      * Envia un email a otro usuario
@@ -50,18 +49,48 @@ public class MailClient
      * de vacaciones
      */
     public void getNextMailItemAndAutorespond(){
-        //Creamos una variable local donde guardar nuestro email y guardamos
-        //En ella el último email del servidor
-        MailItem email = getNextMailItem();
+        //actualiza la memoria
+        actualice();
         //Comprobamos que hubiese algún email y en caso afirmativo lo procesamos
-        if(email != null){
+        if(savedEmail != null){
             //Para ello nos creamos dos variables locales donde poder guardar
             //La información y cambiarla
-            String subject = "RE: " + email.getSubject();
-            String message = "Estoy de vacaciones \n" + email.getMessage();
+            String subject = "RE: " + savedEmail.getSubject();
+            String message = "Estoy de vacaciones \n" + savedEmail.getMessage();
             
             //Enviamos el email al que nos lo envio
-            sendMailItem(email.getFrom(), subject, message);
+            sendMailItem(savedEmail.getFrom(), subject, message);
         }
+    }
+    /**
+     * Muestra por pantalla cuantos emails pendientes tiene el cliente
+     */
+    public void howManyEmails(){
+        System.out.println("Hay " + server.howManyMailItems(user) + " Mensajes nuevos.");
+    }
+    /**
+     * Método que muestra por pantalla el último email recibido
+     */
+    public void printLastMailItem(){
+        print();
+    }
+    /**
+     * PRIVADO:
+     * Imprime por pantalla el email guardad en memoria
+     */
+    private void print(){
+        if(savedEmail != null){
+            savedEmail.print();
+        }
+        else{
+            System.out.println("No hay mensajes pendientes");
+        }
+    }
+    /**
+     * PRIVADO:
+     * Metodo que descarga el último mensaje en servidor y lo guarda en memoria
+     */
+    private void actualice(){
+        savedEmail = server.getNextMailItem(user);
     }
 }
