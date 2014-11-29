@@ -7,10 +7,19 @@
  */
 public class MailClient
 {
+    //Atributos principales
     private MailServer server;
     private String user;
+    //Atributos para el guardado del último email
     private MailItem savedEmail;
+    //Atributo para el clasificado de SPAN
     private boolean isSpan;
+    //CONTADORES PARA ESTADISTICAS:
+    private int countOfSend;
+    private int countOfRecibed;
+    private int countOfSpan;
+    private String longestAuthor;
+    private int numberOfCharacters;
     
     public MailClient(MailServer server, String user){
         this.server = server;
@@ -20,6 +29,12 @@ public class MailClient
         actualice();
         //Inicializamos la variable isSpan comprobando si el mensaje guardado lo es.
         isSpan();
+        //Inicializamos contadores
+        countOfSend = 0;
+        countOfRecibed = 0;
+        countOfSpan = 0;
+        longestAuthor = "";
+        numberOfCharacters = 0;
     }
     /**
      * Metodo que obtiene el ultimo mensaje que halla para el usuario del cliente y
@@ -46,6 +61,8 @@ public class MailClient
     public void sendMailItem(String to, String subject, String message){
         MailItem email = new MailItem(user, to, subject, message);
         server.post(email);
+        //Aumentamos la cuenta de enviados
+        countOfSend = countOfSend + 1;
     }
     /**
      * método que responderá automaticamente los mensajes contestando que estamos
@@ -69,7 +86,8 @@ public class MailClient
      * Muestra por pantalla cuantos emails pendientes tiene el cliente
      */
     public void howManyEmails(){
-        System.out.println("Hay " + server.howManyMailItems(user) + " Mensajes nuevos.");
+        System.out.println("Hay " + server.howManyMailItems(user) + 
+                           " Mensajes nuevos.");
     }
     /**
      * Método que muestra por pantalla el último email recibido
@@ -77,7 +95,20 @@ public class MailClient
     public void printLastMailItem(){
         print();
     }
-    
+    public void viewStadistic(){
+        float spanStadistic;
+        if(countOfRecibed != 0){
+           spanStadistic = ((float)countOfSpan/countOfRecibed) * (100);
+        }
+        else{
+            spanStadistic = 0;
+        }
+        
+        System.out.println("Número de mensajes Enviados: " + countOfSend + "\n"
+                           + "Número de mensajes Recibidos: " + countOfRecibed + 
+                           "\n" + "Porcentaje de Span: " + spanStadistic + "%"
+                           + "\nAutor con email mas largo: " + longestAuthor);
+    }
     
     //------------------------------METODOS PRIVADOS--------------------------------
     /**
@@ -101,6 +132,12 @@ public class MailClient
      */
     private void actualice(){
         savedEmail = server.getNextMailItem(user);
+        //Aumentamos el contador de recibidos si hay algún mensaje nuevo.
+        if(savedEmail != null){
+            countOfRecibed = countOfRecibed + 1;
+            longestEmail();
+        }
+        //Buscamos si el email es SPAN
         isSpan();
     }
     /**
@@ -114,8 +151,10 @@ public class MailClient
            if(message.indexOf("proyecto") != -1){
                 isSpan = false;
            }
-           else if((message.indexOf("oferta") != -1) | (message.indexOf("viagra") != -1)){
+           else if((message.indexOf("oferta") != -1) | 
+                   (message.indexOf("viagra") != -1)){
                isSpan = true;
+               countOfSpan = countOfSpan + 1;
            }
         }
     }
@@ -124,6 +163,20 @@ public class MailClient
      * Imprime el mensaje como SPAN
      */
     private void printAsSpan(){
-        System.out.println("From: " + savedEmail.getFrom() + "\n Subject: SPAN \n Message: SPAN"); 
+        System.out.println("From: " + savedEmail.getFrom() + 
+                           "\n Subject: SPAN \n Message: SPAN"); 
+    }
+    /**
+     * PRIVADO:
+     * mantiene actualizado el autor del mensaje mas largo.
+     */
+    private void longestEmail(){
+        String message = savedEmail.getMessage();
+        //Comprobamos si el mensaje es mas largo y actualizamos los contadores 
+        //según la respuesta
+        if(numberOfCharacters < message.length()){
+            longestAuthor = savedEmail.getFrom();
+            numberOfCharacters = message.length();
+        }
     }
 }
